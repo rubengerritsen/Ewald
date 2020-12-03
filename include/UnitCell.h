@@ -8,6 +8,18 @@
 class UnitCell {
 public:
   UnitCell(Eigen::Vector3d L1, Eigen::Vector3d L2, Eigen::Vector3d L3) {
+    /**
+     * Based on GROMACS's triclinic boxes, that need to satisfy
+     * a_y = a_z = b_z = 0
+     * a_x > 0, b_y > 0, c_z > 0
+     * b_x < 0.5 a_x, c_x < 0.5 a_x, c_y < 0.5 b_y
+     */
+    bool is_gromacs_triclinic_box = L1[1] == 0 && L1[2] == 0 && L2[2] == 0 &&
+                                    L1[0] > 0 && L2[1] > 0 && L3[2] > 0 &&
+                                    L2[0] < 0.5 * L1[0] &&
+                                    L3[0] < 0.5 * L1[0] && L3[1] < 0.5 * L2[1];
+    assert(is_gromacs_triclinic_box);
+
     cell_matrix << L1, L2, L3;
     cell_matrix_inv = cell_matrix.inverse();
     cell_volume = L1.dot(L2.cross(L3));
@@ -31,12 +43,6 @@ public:
     return cell_matrix * n;
   }
 
-  /**
-   * Based on GROMACS's triclinic boxes, that need to satisfy
-   * a_y = a_z = b_z = 0
-   * a_x > 0, b_y > 0, c_z > 0
-   * b_x < 0.5 a_x, c_x < 0.5 a_x, c_y < 0.5 b_y
-   */
   Eigen::Vector3d minImage(Eigen::Vector3d v1, Eigen::Vector3d v2) const {
     Eigen::Vector3d r_tp = v1 - v2;
     Eigen::Vector3d r_dp =
