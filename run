@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cd build
+
+if [ "$1" = "c" ]; then
+    echo "clean build"
+    rm CMakeCache.txt
+fi
+
+cmake .. -DCMAKE_INSTALL_PREFIX=../ || exit 1
+cmake --build . --parallel 6 --target install || exit 1 
+../bin/ewaldRG
