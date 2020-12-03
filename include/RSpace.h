@@ -1,6 +1,7 @@
 
 // Standard includes
 #include <VotcaDefs.h>
+#include <iostream>
 
 #include "UnitCell.h"
 
@@ -8,9 +9,7 @@ class RSpace {
 public:
   RSpace(const double alpha, const double r_max, const UnitCell &unit_cell)
       : alpha(alpha), r_max(r_max), unit_cell(unit_cell) {
-    assert( (r_max < unit_cell.maxRCutOff()) &&
-           "r_max must be smaller than half the smallest perpendicular "
-           "width of the simulation box.");
+    assert(r_max < unit_cell.maxRCutOff());
   }
 
   void compute(const std::vector<Eigen::Vector3d> &xyz,

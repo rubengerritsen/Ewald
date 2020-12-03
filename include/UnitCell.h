@@ -3,6 +3,7 @@
 
 // Standard includes
 #include <VotcaDefs.h>
+#include <iostream>
 
 class UnitCell {
 public:
@@ -48,15 +49,15 @@ public:
   double maxRCutOff() const {
     // Calculates maximum cutoff for which the minimal image convention still
     // makes sense.
-    Eigen::Vector3d AxB = cell_matrix.col(0) * cell_matrix(1);
-    Eigen::Vector3d BxC = cell_matrix.col(1) * cell_matrix(2);
-    Eigen::Vector3d CxA = cell_matrix.col(2) * cell_matrix(0);
+    Eigen::Vector3d AxB = cell_matrix.col(0).cross(cell_matrix.col(1));
+    Eigen::Vector3d BxC = cell_matrix.col(1).cross(cell_matrix.col(2));
+    Eigen::Vector3d CxA = cell_matrix.col(2).cross(cell_matrix.col(0));
 
     double Wa = std::abs(cell_matrix.col(0).dot(BxC)) / BxC.norm();
-    double Wb = std::abs(cell_matrix.col(0).dot(CxA)) / CxA.norm();
-    double Wc = std::abs(cell_matrix.col(0).dot(BxC)) / AxB.norm();
+    double Wb = std::abs(cell_matrix.col(1).dot(CxA)) / CxA.norm();
+    double Wc = std::abs(cell_matrix.col(2).dot(AxB)) / AxB.norm();
 
-    return 0.5 * std::min(Wa, Wb, Wc);
+    return 0.5 * std::min(std::min(Wa, Wb), Wc);
   }
 
   const double getVolume() const { return cell_volume; }

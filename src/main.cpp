@@ -25,8 +25,8 @@ int main(int argc, char **argv) {
     charges[i] = (((ix + iy + iz) % 2) ? 1.0 : -1.0);
   }
 
-  double alpha = 1.2;
-  double r_max = 0.3;
+  double alpha = 1.2113246946;
+  double r_max = 3.99;
   double k_max = 4;
 
   std::array<Eigen::Vector3d, 3> unitCell;
@@ -42,9 +42,6 @@ int main(int argc, char **argv) {
   RSpace rspace(alpha, r_max, cell);
 
   rspace.compute(xyz, charges);
-
-
-
 
 	std::cout << "KSpace energy: " << kspace.getEnergy() << std::endl;
   std::cout << "RSpace energy: " << rspace.getEnergy() << std::endl;
