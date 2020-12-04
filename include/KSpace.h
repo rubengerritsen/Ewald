@@ -1,4 +1,5 @@
-
+#ifndef KSPACE_H
+#define KSPACE_H
 
 // Standard includes
 #include <VotcaDefs.h>
@@ -13,13 +14,12 @@ public:
   void compute(const std::vector<Eigen::Vector3d> &xyz,
                const std::vector<double> &charges);
 
-  double getAk(const Eigen::Vector3d &k) {
-    /* Compute the A_k factor, i.e. k^(-2) exp(-k^2/(4\alpha^2)) */
-    double k_squared = k.squaredNorm();
-    return std::exp(-k_squared / (4 * alpha * alpha)) / k_squared;
-  }
+  double getAk(const Eigen::Vector3d &k) const;
 
   const double getEnergy() const { return energy; }
+
+  void updateAlpha(double a) { alpha = a; }
+  void updateK_max(double k) { k_max = k; }
 
 private:
   double alpha;
@@ -30,3 +30,6 @@ private:
   // RESULTS
   double energy;
 };
+
+
+#endif

@@ -8,17 +8,21 @@
 class UnitCell {
 public:
   UnitCell(Eigen::Vector3d L1, Eigen::Vector3d L2, Eigen::Vector3d L3) {
-    /**
-     * Based on GROMACS's triclinic boxes, that need to satisfy
-     * a_y = a_z = b_z = 0
-     * a_x > 0, b_y > 0, c_z > 0
-     * b_x < 0.5 a_x, c_x < 0.5 a_x, c_y < 0.5 b_y
-     */
     bool is_gromacs_triclinic_box = L1[1] == 0 && L1[2] == 0 && L2[2] == 0 &&
                                     L1[0] > 0 && L2[1] > 0 && L3[2] > 0 &&
                                     L2[0] < 0.5 * L1[0] &&
                                     L3[0] < 0.5 * L1[0] && L3[1] < 0.5 * L2[1];
-    assert(is_gromacs_triclinic_box);
+    if (!is_gromacs_triclinic_box) {
+      std::cout << "a: " << L1.transpose() << std::endl;
+      std::cout << "b: " << L2.transpose() << std::endl;
+      std::cout << "c: " << L3.transpose() << std::endl;
+      throw std::runtime_error(
+          "The simulation box is not a triclinic box in the GROMACS format,\n"
+          "the box vectors (a,b,c) should satisfy:\n"
+          "a_y = a_z = b_z = 0\n"
+          "a_x > 0, b_y > 0, c_z > 0\n"
+          "b_x < 0.5 a_x, c_x < 0.5 a_x, c_y < 0.5 b_y\n");
+    }
 
     cell_matrix << L1, L2, L3;
     cell_matrix_inv = cell_matrix.inverse();
@@ -52,9 +56,11 @@ public:
     return r_sp - cell_matrix.col(0) * std::round(r_sp.x() / cell_matrix(0, 0));
   }
 
+  /**
+   * Calculates maximum cutoff for which the minimal image convention still
+   * makes sense.
+   */
   double maxRCutOff() const {
-    // Calculates maximum cutoff for which the minimal image convention still
-    // makes sense.
     Eigen::Vector3d AxB = cell_matrix.col(0).cross(cell_matrix.col(1));
     Eigen::Vector3d BxC = cell_matrix.col(1).cross(cell_matrix.col(2));
     Eigen::Vector3d CxA = cell_matrix.col(2).cross(cell_matrix.col(0));

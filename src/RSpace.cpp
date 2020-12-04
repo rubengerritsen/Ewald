@@ -20,8 +20,8 @@ void RSpace::compute(const std::vector<Eigen::Vector3d> &xyz,
   }
 
   // Self energy correction
-  double U_self = 0.0;
+  selfEnergy = 0.0;
   for(Index i = 0; i < xyz.size(); ++i){
-    energy += -charges[i]*charges[i] * alpha / sqrt_pi;
+    selfEnergy += -charges[i]*charges[i] * alpha / sqrt_pi;
   }
 }
